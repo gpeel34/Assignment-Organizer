@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Homework Assignment</title>
+    <style>
+      
+        #add-assignment-btn:hover {
+        background-color:
+          rgb(0,
+            255,
+            115);
+        transform:
+          scale(1.1);
+        box-shadow:
+          3px 3px #601818;
+        text-shadow: #4c84af
+      }
+
+      title:hover {
+        background-color:
+          rgb(0,
+            255,
+            115);
+        transform:
+          scale(1.1);
+        box-shadow:
+          3px 3px #601818;
+        text-shadow: #4c84af
+      }
+
+      table {
+        border-collapse:
+          collapse;
+        width:
+          100%;
+      }
+
+      th,
+      td {
+        text-align:
+          left;
+        padding:
+          8px;
+        border-bottom:
+          1px solid #ddd;
+      }
+
+      tr:nth-child(even) {
+        background-color:
+          #f2f2f2;
+      }
+
+      th {
+        background-color:
+          #4c84af;
+        color:
+          white;
+      }
+
+      .difficulty-low {
+        color:
+          green;
+      }
+
+      #difficulty:hover {
+        background-color:
+          rgb(0,
+            255,
+            115);
+        transform:
+          scale(1.1);
+        box-shadow:
+          3px 3px #601818;
+        text-shadow: #4c84af
+      }
+
+      .difficulty-high {
+        color:
+          rgb(255,
+            47, 0);
+      }
+
+      body {
+        background: linear-gradient(to right,
+            rgb(222,
+              237, 237),
+            rgb(127,
+              176, 187),
+            rgb(116,
+              180, 225));
+      }
+
+      h1 {
+        font-family: Georgia,
+          'Times New Roman',
+          Times, serif
+      }
+
+      form {
+        font-family:
+          'Franklin Gothic Medium',
+          'Arial Narrow', Arial,
+          sans-serif;
+      }
+    </style>
+   
+  </head>
+  <body>
+    <h1>Assignments Organizer</h1>
+    <h2>Beta Version</h2>
+    <form>
+      <label for="title">Assignment Title:</label>
+      <input type="text" id="title" name="title">
+      <br>
+      <br>
+      <label for="difficulty">Difficulty:</label>
+      <select id="difficulty" name="difficulty">
+        <option value="Easy" id="difficulty-low">Easy</option>
+        <option value="Medium">Medium</option>
+        <option value="Hard">Hard</option>
+      </select>
+      <br>
+      <br>
+      <label for="due-date">Due Date:</label>
+      <input type="date" id="due-date" name="due-date">
+      <br>
+      <br>
+      <input type="submit" value="Add Assignment" id="add-assignment-btn">
+    </form>
+    <br>
+    <table>
+      <thead>
+        <tr>
+          <th>Due Date</th>
+          <th>Assignment</th>
+          <th>Difficulty</th>
+        </tr>
+      </thead>
+      <tbody id="assignment-table"></tbody>
+    </table>
+    <script>
+      // get assignments from local storage, or initialize an empty array
+      let assignments = JSON.parse(localStorage.getItem("assignments")) || [];
+      const form = document.querySelector("form");
+      const table = document.getElementById("assignment-table");
+      form.addEventListener("submit", function(event) {
+        event.preventDefault();
+        const title = document.getElementById("title").value;
+        const difficulty = document.getElementById("difficulty").value;
+        const dueDate = document.getElementById("due-date").value;
+        assignments.push({
+          title,
+          difficulty,
+          dueDate
+        });
+        assignments = sortAssignments(assignments);
+        renderTable();
+        form.reset();
+      });
+
+      function sortAssignments(assignments) {
+        return assignments.sort((a, b) => {
+          if (a.difficulty === "High" && b.difficulty !== "High") {
+            return -1;
+          } else if (b.difficulty === "High" && a.difficulty !== "High") {
+            return 1;
+          } else {
+            return new Date(a.dueDate) - new Date(b.dueDate);
+          }
+        });
+      }
+
+      function renderTable() {
+        table.innerHTML = "";
+        assignments.forEach(assignment => {
+          const row = document.createElement("tr");
+          const dueDateCell = document.createElement("td");
+          dueDateCell.textContent = assignment.dueDate;
+          row.appendChild(dueDateCell);
+          const titleCell = document.createElement("td");
+          titleCell.textContent = assignment.title;
+          row.appendChild(titleCell);
+          const difficultyCell = document.createElement("td");
+          difficultyCell.textContent = assignment.difficulty;
+          difficultyCell.classList.add(`difficulty-${assignment.difficulty.toLowerCase()}`);
+          row.appendChild(difficultyCell);
+          table.appendChild(row);
+        });
+        // store assignments array in local storage
+        localStorage.setItem("assignments", JSON.stringify(assignments));
+      }
+      renderTable();
+    </script>
+  </body>
+</html>
